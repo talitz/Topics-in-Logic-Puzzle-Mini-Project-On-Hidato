@@ -64,6 +64,8 @@ public class ReductionToHamiltonianPathAlgorithm {
 					    				System.out.println("now we need to decide - what value is he going to get?");
 					    				
 							    		int valueToTry = hidato.tryToMatchValueToCell(vertexIndex);
+							    		if(valueToTry == 2) 
+							    			System.out.println("");
 					    				System.out.println("let's try: " + valueToTry);
 					    
 					    				hidato.setCellWithNewValue(vertexIndex, valueToTry); //build the new grid graph
@@ -87,6 +89,9 @@ public class ReductionToHamiltonianPathAlgorithm {
 				    			done = true; //we have values for all cells!
 			    		}
 			    	}
+			    	System.out.println();
+			    	System.out.println("final path solution is " + path);
+			    	System.out.println(hidato);
 		    } else {
 			    	System.out.println("This Hidato has no solution!");
 		    }
@@ -123,7 +128,7 @@ public class ReductionToHamiltonianPathAlgorithm {
 						right = board[i][j+1];
 					} else {
 						right = board[i][j+1];
-						if(GridGraph[currentIndex][right.getIndex()] == 0 && current.isPartOfHamiltonianPath())
+						if(GridGraph[currentIndex][right.getIndex()] == 0 || !current.isPartOfHamiltonianPath())
 							right = null;
 					}
 				 }
@@ -133,7 +138,7 @@ public class ReductionToHamiltonianPathAlgorithm {
 						bottom = board[i+1][j];
 					} else {
 						bottom = board[i+1][j];
-					    if(GridGraph[currentIndex][bottom.getIndex()] == 0 && current.isPartOfHamiltonianPath())
+					    if(GridGraph[currentIndex][bottom.getIndex()] == 0 || !current.isPartOfHamiltonianPath())
 					    	bottom = null;
 					} 
 				 }
@@ -143,7 +148,7 @@ public class ReductionToHamiltonianPathAlgorithm {
 						 downRightDiagonal = board[i + 1][j + 1];
 					} else {
 						downRightDiagonal = board[i + 1][j + 1];
-						if(GridGraph[currentIndex][downRightDiagonal.getIndex()] == 0 && current.isPartOfHamiltonianPath())
+						if(GridGraph[currentIndex][downRightDiagonal.getIndex()] == 0 || !current.isPartOfHamiltonianPath())
 							downRightDiagonal = null;
 					}
 
@@ -154,7 +159,7 @@ public class ReductionToHamiltonianPathAlgorithm {
 						 downLeftDiagonal = board[i + 1][j - 1];
 					} else {
 						downLeftDiagonal = board[i + 1][j - 1];
-						if(GridGraph[currentIndex][downLeftDiagonal.getIndex()] == 0 && current.isPartOfHamiltonianPath())
+						if(GridGraph[currentIndex][downLeftDiagonal.getIndex()] == 0 || !current.isPartOfHamiltonianPath())
 							downLeftDiagonal = null;
 					}
 					
@@ -179,15 +184,14 @@ public class ReductionToHamiltonianPathAlgorithm {
 					 
 				 boolean oneEdgeOnly = oneRightEdgeOnly || oneBottomEdgeOnly || oneDownRightDiagonalEdgeOnly || oneDownLeftDiagonalEdgeOnly;
 				 
-				 if(currentIndex == 2) {
-					 System.out.println("im 2");
-				 }
 				 if(oneEdgeOnly) {
 					 if(oneRightEdgeOnly && !right.isPartOfHamiltonianPath()) {
 						 Arrays.fill(GridGraph[currentIndex], 0);
-
+						 for(int k = 0; k < GridGraph[0].length; k++)
+							 GridGraph[k][currentIndex] = 0;
 						 
-						 GridGraph[currentIndex][currentIndex] = 1; //every vertex is connected to itself... trivial 
+						 GridGraph[currentIndex][currentIndex] = 1;
+						 
 						 GridGraph[currentIndex][right.getIndex()] = 1;
 						 GridGraph[right.getIndex()][currentIndex] = 1;
 						 current.setIsPartOfHamiltonianPath(true);
@@ -195,9 +199,10 @@ public class ReductionToHamiltonianPathAlgorithm {
 					 }
 					 if(oneBottomEdgeOnly && !bottom.isPartOfHamiltonianPath()) {
 						 Arrays.fill(GridGraph[currentIndex], 0);
-
+						 for(int k = 0; k < GridGraph[0].length; k++)
+							 GridGraph[k][currentIndex] = 0;
 						 
-						 GridGraph[currentIndex][currentIndex] = 1; //every vertex is connected to itself... trivial 
+						 GridGraph[currentIndex][currentIndex] = 1; 
 						 GridGraph[currentIndex][bottom.getIndex()] = 1;
 						 GridGraph[bottom.getIndex()][currentIndex] = 1;
 						 current.setIsPartOfHamiltonianPath(true);
@@ -205,8 +210,10 @@ public class ReductionToHamiltonianPathAlgorithm {
 					 }
 					 if(oneDownRightDiagonalEdgeOnly && !downRightDiagonal.isPartOfHamiltonianPath()) {
 						 Arrays.fill(GridGraph[currentIndex], 0);
+						 for(int k = 0; k < GridGraph[0].length; k++)
+							 GridGraph[k][currentIndex] = 0;
 						 
-						 GridGraph[currentIndex][currentIndex] = 1; //every vertex is connected to itself... trivial 
+						 GridGraph[currentIndex][currentIndex] = 1;
 						 GridGraph[currentIndex][downRightDiagonal.getIndex()] = 1;
 						 GridGraph[downRightDiagonal.getIndex()][currentIndex] = 1;
 						 current.setIsPartOfHamiltonianPath(true);
@@ -214,9 +221,10 @@ public class ReductionToHamiltonianPathAlgorithm {
 					 }
 					 if(oneDownLeftDiagonalEdgeOnly  && !downLeftDiagonal.isPartOfHamiltonianPath()) {
 						 Arrays.fill(GridGraph[currentIndex], 0);
+						 for(int k = 0; k < GridGraph[0].length; k++)
+							 GridGraph[k][currentIndex] = 0;
 						 
-						 
-						 GridGraph[currentIndex][currentIndex] = 1; //every vertex is connected to itself... trivial 
+						 GridGraph[currentIndex][currentIndex] = 1;
 						 GridGraph[currentIndex][downLeftDiagonal.getIndex()] = 1;
 						 GridGraph[downLeftDiagonal.getIndex()][currentIndex] = 1;
 						 current.setIsPartOfHamiltonianPath(true);
@@ -224,14 +232,14 @@ public class ReductionToHamiltonianPathAlgorithm {
 					 }		 
 				 } else {
 						 //if a righty neighbor exists
-						 if(right != null && !oneEdgeOnly && !right.isPartOfHamiltonianPath()) {
+						 if(right != null && !oneEdgeOnly && !right.isPartOfHamiltonianPath()) { 
 							 //the right neighbor is connected to him
 							 GridGraph[currentIndex][right.getIndex()] = 1;
 							 GridGraph[right.getIndex()][currentIndex] = 1;
 						 }
 						 
 						 //if a bottom neighbor exists
-						 if(bottom != null && !oneEdgeOnly && !bottom.isPartOfHamiltonianPath()) {			 
+						 if(bottom != null && !oneEdgeOnly && !bottom.isPartOfHamiltonianPath()) {		 
 							 //the right neighbor is connected to him
 							 GridGraph[currentIndex][bottom.getIndex()] = 1;
 							 GridGraph[bottom.getIndex()][currentIndex] = 1;
@@ -239,7 +247,6 @@ public class ReductionToHamiltonianPathAlgorithm {
 						 
 						 //if a down right diagonal neighbor exists
 						 if(downRightDiagonal != null && !oneEdgeOnly && !downRightDiagonal.isPartOfHamiltonianPath()) {
-							 
 							 //the right neighbor is connected to him
 							 GridGraph[currentIndex][downRightDiagonal.getIndex()] = 1;
 							 GridGraph[downRightDiagonal.getIndex()][currentIndex] = 1;

@@ -115,7 +115,7 @@ public class Hidato {
 
 		for(int i=0; i<board.length; i++) {
 				for(int j=0; j<board[i].length; j++) {
-					ans += "("+board[i][j].getIndex() + "," + board[i][j].getValue() + ") ";
+					ans += board[i][j].getValue() + " ";
 				}
 				ans += "\n";
 		}

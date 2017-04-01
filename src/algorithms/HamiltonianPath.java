@@ -11,10 +11,11 @@ public class HamiltonianPath
 
     private int[][] graph;
 
-    public boolean isHamiltonianPath(int[][] g)
+    public String isHamiltonianPath(int[][] g)
 
     {
-    	return !findHamiltonianPath(g).equals("No solution");	
+    	String path = findHamiltonianPath(g); 
+    	return path.equals("No solution")? null : path;	
     }
     
     public String findHamiltonianPath(int[][] g) {
@@ -40,7 +41,7 @@ public class HamiltonianPath
 
     public void solve(int vertex) throws Exception {
         /** solution **/
-        if (graph[vertex][0] == 1 && pathCount == V)
+        if (pathCount == V)
             throw new Exception();
 
         /** all vertices selected but last vertex not linked to 0 **/
@@ -96,11 +97,19 @@ public class HamiltonianPath
     public static void main (String[] args)  {
         HamiltonianPath hc = new HamiltonianPath();
 
-        int[][] graph = {	{1, 1, 1, 1},
-        					{1, 1, 1, 1},
-        					{1, 1, 1, 1},
-        					{1, 1, 1, 1}    };
+        int[][] graph =         {   {1, 1 ,0 ,0 ,0 ,0 ,0 ,0 ,0 },
+        							{ 1, 1 ,1 ,1 ,1 ,1 ,0 ,0 ,0 },
+        							{ 0 ,1, 1, 0, 1, 1, 0, 0, 0 },
+        							{0, 1 ,0 ,1, 1 ,0 ,1 ,1 ,0 },
+        							{0 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 },
+        							{ 0 ,1 ,1 ,0 ,1 ,1 ,0 ,1 ,1 },
+        							{ 0 ,0, 0, 1, 1, 0, 1, 1, 0 },
+        							{ 0 ,0 ,0 ,1 ,1 ,1 ,1 ,1 ,1 },
+        							{ 0 ,0 ,0 ,0 ,1 ,1 ,0 ,1 ,1 }};
 
+
+        
+        
         System.out.println(hc.isHamiltonianPath(graph));
         System.out.println(hc.findHamiltonianPath(graph));        
 

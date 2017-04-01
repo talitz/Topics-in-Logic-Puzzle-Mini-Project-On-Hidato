@@ -6,10 +6,12 @@ public class Hidato {
 	private int start;
     private int end;
     private Cell[][] board;
-    private ArrayList<Integer> existingValues;
-    private ArrayList<Integer> nonExistingValues;
+    @SuppressWarnings("rawtypes")
+	private ArrayList<Integer> existingValues = new ArrayList<Integer>();
+    private ArrayList<Integer> nonExistingValues = new ArrayList<Integer>();
 	private int runner = -1;
 	
+	@SuppressWarnings("unchecked")
 	public Hidato(int start, int end, Cell[][] board) {
 		super();
 		this.start = start;
@@ -61,20 +63,64 @@ public class Hidato {
 		return existingValues;
 	}
 	
-	public Cell getCellByVertexValue(int value) {
+	public Cell getCellByVertexIndex(int index) {
 		for(int i=0; i<board.length; i++) {
-			for(int j=0;j<board.length;j++) {
+			for(int j=0;j<board[i].length;j++) {
 				Cell current = board[i][j];
-				if(current.getValue().equals(value)) return current;
+				if(current.getIndex() == index)
+					return current;
 			}
 		}
 		return null;
 	}
 
-	public int tryToMatchValueToCell(int vertexIndex) {
-		runner = (runner + 1)%end;
-		return nonExistingValues.get(runner);
+	public void setRunner() {
+		runner = -1;
 	}
 	
+	public int tryToMatchValueToCell(int vertexIndex) {
+		runner = (runner + 1)%end;
+		return (int) nonExistingValues.get(runner);
+	}
 
+	public void addToExistingValue(int valueToTry) {
+		existingValues.add(valueToTry);	
+		nonExistingValues.remove(nonExistingValues.indexOf(valueToTry));
+	}
+	
+	public void setCellWithNewValue(int index, int value) {
+		for(int i=0; i<board.length; i++) {
+			for(int j=0;j<board[i].length;j++) {
+				Cell current = board[i][j];
+				if(current.getIndex() == index) {
+					current.setValue(value);
+				}
+			}
+		}
+	}
+	
+	public String toString() {
+		String ans = "Hidato puzzle!\n";
+		ans += "start = " + start + ", end = "+end + "\n";
+		ans += "existing values: ";
+		for(int value  : existingValues) {
+			ans += ""+value + ", ";
+		}
+		ans += "\n";
+		ans += "non existing values: ";
+		for(int value  : nonExistingValues) {
+			ans += ""+value+" ,";
+		}
+		ans += "\n";
+
+		for(int i=0; i<board.length; i++) {
+				for(int j=0; j<board[i].length; j++) {
+					ans += "("+board[i][j].getIndex() + "," + board[i][j].getValue() + ") ";
+				}
+				ans += "\n";
+		}
+		ans += "\n";
+		return ans;
+	}
+	
 }

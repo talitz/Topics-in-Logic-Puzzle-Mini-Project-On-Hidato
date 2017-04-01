@@ -186,48 +186,60 @@ public class ReductionToHamiltonianPathAlgorithm {
 				 
 				 if(oneEdgeOnly) {
 					 if(oneRightEdgeOnly && !right.isPartOfHamiltonianPath()) {
-						 Arrays.fill(GridGraph[currentIndex], 0);
-						 for(int k = 0; k < GridGraph[0].length; k++)
-							 GridGraph[k][currentIndex] = 0;
+						 if(!current.isPartOfHamiltonianPath()) {
+							 Arrays.fill(GridGraph[currentIndex], 0);
+						 	 for(int k = 0; k < GridGraph[0].length; k++)
+						 		 GridGraph[k][currentIndex] = 0;
+						 }
 						 
 						 GridGraph[currentIndex][currentIndex] = 1;
 						 
 						 GridGraph[currentIndex][right.getIndex()] = 1;
 						 GridGraph[right.getIndex()][currentIndex] = 1;
 						 current.setIsPartOfHamiltonianPath(true);
+						 right.setIsPartOfHamiltonianPath(true);
 						 continue;
 					 }
 					 if(oneBottomEdgeOnly && !bottom.isPartOfHamiltonianPath()) {
-						 Arrays.fill(GridGraph[currentIndex], 0);
-						 for(int k = 0; k < GridGraph[0].length; k++)
-							 GridGraph[k][currentIndex] = 0;
+						 if(!current.isPartOfHamiltonianPath()) {
+							 Arrays.fill(GridGraph[currentIndex], 0);
+							 for(int k = 0; k < GridGraph[0].length; k++)
+								 GridGraph[k][currentIndex] = 0;
+						 }
 						 
 						 GridGraph[currentIndex][currentIndex] = 1; 
 						 GridGraph[currentIndex][bottom.getIndex()] = 1;
 						 GridGraph[bottom.getIndex()][currentIndex] = 1;
 						 current.setIsPartOfHamiltonianPath(true);
+						 bottom.setIsPartOfHamiltonianPath(true);
 						 continue;
 					 }
 					 if(oneDownRightDiagonalEdgeOnly && !downRightDiagonal.isPartOfHamiltonianPath()) {
-						 Arrays.fill(GridGraph[currentIndex], 0);
-						 for(int k = 0; k < GridGraph[0].length; k++)
-							 GridGraph[k][currentIndex] = 0;
+						 if(!current.isPartOfHamiltonianPath()) {
+							 Arrays.fill(GridGraph[currentIndex], 0);
+							 for(int k = 0; k < GridGraph[0].length; k++)
+								 GridGraph[k][currentIndex] = 0;
+						 }
 						 
 						 GridGraph[currentIndex][currentIndex] = 1;
 						 GridGraph[currentIndex][downRightDiagonal.getIndex()] = 1;
 						 GridGraph[downRightDiagonal.getIndex()][currentIndex] = 1;
 						 current.setIsPartOfHamiltonianPath(true);
+						 downRightDiagonal.setIsPartOfHamiltonianPath(true);
 						 continue;
 					 }
 					 if(oneDownLeftDiagonalEdgeOnly  && !downLeftDiagonal.isPartOfHamiltonianPath()) {
-						 Arrays.fill(GridGraph[currentIndex], 0);
-						 for(int k = 0; k < GridGraph[0].length; k++)
-							 GridGraph[k][currentIndex] = 0;
+						 if(!current.isPartOfHamiltonianPath()) {
+							 Arrays.fill(GridGraph[currentIndex], 0);
+							 for(int k = 0; k < GridGraph[0].length; k++)
+								 GridGraph[k][currentIndex] = 0;
+						 }
 						 
 						 GridGraph[currentIndex][currentIndex] = 1;
 						 GridGraph[currentIndex][downLeftDiagonal.getIndex()] = 1;
 						 GridGraph[downLeftDiagonal.getIndex()][currentIndex] = 1;
 						 current.setIsPartOfHamiltonianPath(true);
+						 downLeftDiagonal.setIsPartOfHamiltonianPath(true);
 						 continue;
 					 }		 
 				 } else {

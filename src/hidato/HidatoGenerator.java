@@ -7,8 +7,8 @@ public class HidatoGenerator {
 	public Hidato Generate(int start, int end) {
 		CellGenerator cellGenerator = new CellGenerator();
 		
-		Cell[][] board = {   {cellGenerator.Generate(1),    cellGenerator.Generate(),  cellGenerator.Generate()},
-						     {cellGenerator.Generate(3),    cellGenerator.Generate(4),  cellGenerator.Generate()},
+		Cell[][] board = {   {cellGenerator.Generate(1),    cellGenerator.Generate(2),  cellGenerator.Generate(3)},
+						     {cellGenerator.Generate(),    cellGenerator.Generate(),  cellGenerator.Generate(4)},
 						     {cellGenerator.Generate(),    cellGenerator.Generate(),  cellGenerator.Generate(9)}  };
 		
 		return new Hidato(1,9,board);

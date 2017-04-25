@@ -16,7 +16,7 @@ public class ReductionToHamiltonianPathAlgorithm {
 		this.hidato = hidato;
 
 	}
-	
+/*	
 	public String setAndRunReductionToHamiltonPathAlgorithm() {  
 		
 		    System.out.println("Just got a hidato puzzle, convert it into a grid graph!");
@@ -98,7 +98,7 @@ public class ReductionToHamiltonianPathAlgorithm {
 			    	return "This Hidato has no solution!";
 		    }
 	}
-
+*/
 	//this function is building a grid graph based on the hidato puzzle.
 	//very important - if we have successors i, i+1 there must be one edge between them and only one edge!
 	//so the hamiltonian path will go through this edge and we find a solution!

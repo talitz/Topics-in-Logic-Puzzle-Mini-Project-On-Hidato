@@ -48,49 +48,54 @@ public class HamiltonianPath
         if (pathCount == V)
            return;
         
+    	
+        System.out.println("start with vertex v = "+vertex);
+        System.out.println("trying to find the best neighbor we can!");
+   	 int neighborFound = -1;
+   	 for (int t = 0; t < V; t++) {
+   		 System.out.println("checking ("+vertex+","+t+")");
+   		 System.out.println("graph[vertex][t] " + graph[vertex][t]);
+   		 System.out.println("pathCount " + pathCount);
+   		 if(vertex != t && graph[vertex][t] == 1 && vertexValues[t] != -1 && vertexValues[t] == pathCount+1) {
+   			 System.out.println("vertex = "+vertex + " is connected to vertex t="+t);
+   			 System.out.println("t's value is = "+vertexValues[t]);
+   			 neighborFound = t;
+   			 break;
+   		 }
+   	 }
+   	 
+   	 System.out.println();
+
+	 if(neighborFound != -1) {
+		     System.out.println("we found the right neighbor to continue with: neighborFound = "+neighborFound);
+             /** add to path **/            
+             path[pathCount++] = neighborFound;    
+
+             /** remove connection **/            
+             graph[vertex][neighborFound] = 0;
+             graph[neighborFound][vertex] = 0;
+
+             /** if vertex not already selected  solve recursively **/
+             if (!isPresent(neighborFound))
+                 solve(neighborFound,vertexValues);
+
+             /** restore connection **/
+             graph[vertex][neighborFound] = 1;
+             graph[neighborFound][vertex] = 1;
+
+             /** remove path **/
+             path[--pathCount] = -1;  
+		 
+	 } else {
+		 System.out.println("we did not found the right neighbor to continue with: neighborFound = "+neighborFound);
         for (int v = 0; v < V; v++) {
-        	
-             System.out.println("start with vertex v = "+vertex);
-             System.out.println("trying to find the best neighbor we can!");
-        	 int neighborFound = -1;
-        	 for (int t = v+1; t < V; t++) {
-        		 System.out.println("checking ("+vertex+","+t+")");
-        		 System.out.println("graph[vertex][t] " + graph[vertex][t]);
-        		 System.out.println("vertexValues[t] " + vertexValues[t] );
-        		 if(vertex != t && graph[vertex][t] == 1 && vertexValues[t] != -1 && vertexValues[t] == t - 1) {
-        			 System.out.println("vertex = "+vertex + " is connected to vertex t="+t);
-        			 System.out.println("t's value is = "+vertexValues[t]);
-        			 neighborFound = t;
-        			 break;
-        		 }
-        	 }
-        	 
-        	 System.out.println("We found neighborFound = "+ neighborFound);
-        	 if(neighborFound != -1) {
-        		     System.out.println("we found the right neighbor to continue with: neighborFound = "+neighborFound);
-	                 /** add to path **/            
-	                 path[pathCount++] = neighborFound;    
-	
-	                 /** remove connection **/            
-	                 graph[vertex][neighborFound] = 0;
-	                 graph[neighborFound][vertex] = 0;
-	
-	                 /** if vertex not already selected  solve recursively **/
-	                 if (!isPresent(neighborFound))
-	                     solve(neighborFound,vertexValues);
-	
-	                 /** restore connection **/
-	                 graph[vertex][neighborFound] = 1;
-	                 graph[neighborFound][vertex] = 1;
-	
-	                 /** remove path **/
-	                 path[--pathCount] = -1;  
-	                 break;
-        		 
-        	 } else {
+
+    		    
+    		     
                  /** if connected **/
-                 if (graph[vertex][v] == 1) {
+                 if (graph[vertex][v] == 1 && vertexValues[v] == -1 ) {
                  
+                	 System.out.println("connecting  ("+vertex + "," + v+")");
                      /** add to path **/            
                      path[pathCount++] = v;    
 
@@ -112,7 +117,8 @@ public class HamiltonianPath
         	 }
 
         }
-    }    
+    }
+
 
     public boolean isPresent(int v) {
         for (int i = 0; i < pathCount - 1; i++)

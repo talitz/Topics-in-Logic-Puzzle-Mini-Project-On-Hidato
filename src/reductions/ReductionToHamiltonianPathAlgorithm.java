@@ -1,309 +1,331 @@
 package reductions;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.stream.Collectors;
 
 import algorithms.HamiltonianPath;
 import hidato.Cell;
 import hidato.Hidato;
-import hidato.HidatoGenerator;
 
 public class ReductionToHamiltonianPathAlgorithm {
 	
 	private int[][] GridGraph;
 	private Hidato hidato;
+	private Cell lastCellBelongToHemiltonianPath = null;
+	private Cell[][] board = null;
+	int [] vertexValues = null;
 	
 	public ReductionToHamiltonianPathAlgorithm(Hidato hidato) {
 		this.GridGraph = new int[hidato.getEnd()][hidato.getEnd()];
 		this.hidato = hidato;
-
+		this.board = hidato.getBoard();
+		vertexValues = new int[this.GridGraph.length];
+		lastCellBelongToHemiltonianPath = calculateLastCellBelongToHemiltonianPath();
 	}
-/*	
+	
 	public String setAndRunReductionToHamiltonPathAlgorithm() {  
 		
 		    System.out.println("Just got a hidato puzzle, convert it into a grid graph!");
-			
 		    System.out.println(hidato);
+		    ArrayList<Integer> missingValues = hidato.getNonExistingValues();
+		    hidato.getCellByVertexIndex(0).setIsPartOfHamiltonianPath(true);
 		    
-		    convertHidatoToGridGraph(true);
-			
+		    convertHidatoToFullGridGraph();
+		    removeEdgesToVertexWithValueOne();
 			displayGridGraph(GridGraph);
-		    
+
+		    removeEdgesAmongNeighborsWithSuccessorValues();
+		    displayGridGraph(GridGraph);
+
 			HamiltonianPath hamiltonianPathAlgorithm = new HamiltonianPath();
-		    
-		    String path = hamiltonianPathAlgorithm.isHamiltonianPath(GridGraph);
-		    
-		    boolean done = false;
-		    
-		    if(path != null) {
-			    	//we have a potential solution to the hidato puzzle! let's try and solve it!
-			    	System.out.println("found hamiltonian path: " + path);
-			    	done = false;
-			    	
-			    	while(!done) {
-			    		String[] vertexes = path.split(";");
-			    		
-			    		//now we need to find the first vertex without value!
-			    		int countAllCellsWithValues = 0;
-			    		int vertexIndex = -1;
-			    	
-			    		for(String vertex : vertexes) {
-				    			 Cell current = hidato.getCellByVertexIndex(Integer.valueOf(vertex)); 
-				    			 if(current.getValue() == null) {
-				    				 System.out.println("the first vertex with no value is with index" +current.getIndex());
-				    				 vertexIndex = current.getIndex();
-				    				 break;
-				    			 } else {
-				    				 countAllCellsWithValues++;
-				    			 }
-			    		}
-			    		
-			    		if(countAllCellsWithValues < hidato.getEnd()) {
-			    				boolean decideOnNewValue = false;
-			    				hidato.setRunner();
-					    		while(!decideOnNewValue) {
-							    		//now we need to decide - what value is he going to get?
-					    				System.out.println("now we need to decide - what value is he going to get?");
-					    				
-							    		int valueToTry = hidato.tryToMatchValueToCell(vertexIndex);
-							    		if(valueToTry == 2) 
-							    			System.out.println("");
-					    				System.out.println("let's try: " + valueToTry);
-					    
-					    				hidato.setCellWithNewValue(vertexIndex, valueToTry); //build the new grid graph
-					    				convertHidatoToGridGraph(false);
-					    				System.out.println("The new Hidato is now:");
-					    				System.out.println(hidato);
-					    				System.out.println("With the grid");
-					    				displayGridGraph(GridGraph);
-					    				
-							    		path = hamiltonianPathAlgorithm.isHamiltonianPath(GridGraph);
-							    		if(path != null) {
-						    				System.out.println("we found an hamiltonian path with the value = " + valueToTry + ", path = "+path);
-							    			hidato.addToExistingValue(valueToTry);
-							    			decideOnNewValue = true; //go find it's path and keep on
-							    			System.out.println("continue with the algorithm...");
-							    		} else {
-							    			System.out.println("could not find a path for this one");
-							    		}
-					    		}
-			    		} else {
-				    			done = true; //we have values for all cells!
-			    		}
-			    	}
-			    	System.out.println();
-			    	System.out.println("final path solution is " + path);
-			    	System.out.println(hidato);
-			    	return path;
-		    } else {
-			    	System.out.println("This Hidato has no solution!");
-			    	return "This Hidato has no solution!";
+
+			constructVertexValues();
+			
+		    String path = null;
+ 
+		    while(!missingValues.isEmpty()) {
+		            System.out.println("--------------------------");
+		    		Integer b = missingValues.remove(0);
+		    		ArrayList<Integer> neighborsIndexesToPutAt = new ArrayList<Integer>();
+		    		Cell current = lastCellBelongToHemiltonianPath;
+		    		int i,j;
+		    		
+		    		for(int k = 0; k < board.length*board.length; k++) {
+		    			if(GridGraph[current.getIndex()][k] == 1 && hidato.getCellByVertexIndex(k).getValue() == null) {
+		    				neighborsIndexesToPutAt.add(k);
+		    			}
+		    		}
+		    		
+		    		int index = !neighborsIndexesToPutAt.isEmpty() ? neighborsIndexesToPutAt.remove(0) : -1;
+		    		
+		    		if(index != -1) {	
+				    	Cell firstToPutAt = hidato.getCellByVertexIndex(index);
+				    	hidato.setCellWithNewValue(index, b);
+				        System.out.println(hidato);
+				    	constructVertexValues();
+				    	path = hamiltonianPathAlgorithm.isHamiltonianPath(GridGraph,vertexValues);
+				    	System.out.println("--------------------------");
+				    	while(path == null) {
+				    		hidato.setCellWithNewValue(index, null); //this value didn't work for us...
+				    		if(neighborsIndexesToPutAt.isEmpty()) return "There is no solution for this Hidato riddle!";
+				    		else {
+				    				index = neighborsIndexesToPutAt.remove(0);
+				    				firstToPutAt = hidato.getCellByVertexIndex(index);
+						    		hidato.setCellWithNewValue(firstToPutAt.getIndex(), b);
+						    		   System.out.println(hidato);
+						    		constructVertexValues();
+						    		path = hamiltonianPathAlgorithm.isHamiltonianPath(GridGraph,vertexValues);
+				    		}
+				    	}
+				    		
+				    	removeEdgesAmongNeighborsWithSuccessorValues();
+				    	firstToPutAt.setIsPartOfHamiltonianPath(true);
+				    	lastCellBelongToHemiltonianPath = calculateLastCellBelongToHemiltonianPath();
+		    		} else {
+		    			missingValues.add(b);
+		    			Collections.sort(missingValues);
+		    		}
+		    		
 		    }
+		    System.out.println(hidato);
+		    return path;    
+	
 	}
-*/
-	//this function is building a grid graph based on the hidato puzzle.
-	//very important - if we have successors i, i+1 there must be one edge between them and only one edge!
-	//so the hamiltonian path will go through this edge and we find a solution!
-	public void convertHidatoToGridGraph(boolean isFirst) {
+
+	private void constructVertexValues() {
+		for(int i=0; i<vertexValues.length; i++) {
+			   Cell curr = hidato.getCellByVertexIndex(i);
+			   if(curr.getValue() == null) vertexValues[i] = -1;
+			   else vertexValues[i] = curr.getValue();	    
+		}
+	}
+	
+	private Cell calculateLastCellBelongToHemiltonianPath() {
+	    int max = board.length*board.length;
+	    Cell maxCell = null;
+	    ArrayList<Cell> allCellsWithValues = new ArrayList<Cell>();
+		for(int i=0; i<board.length; i++) {
+			for(int j=0; j<board[i].length; j++) {
+				 if(board[i][j].getValue() != null && board[i][j].getValue() < max) {
+					 allCellsWithValues.add(board[i][j]);
+				 }
+			}
+		}	
+		Collections.sort(allCellsWithValues, new CellComparator());
+		return allCellsWithValues.remove(allCellsWithValues.size()-1);
+	}
+	class CellComparator implements Comparator<Cell> {
+	    @Override
+	    public int compare(Cell a, Cell b) {
+	        return a.getValue().compareTo(b.getValue());
+	    }
+	}
+	private void removeEdgesAmongNeighborsWithSuccessorValues() {
+		Cell current = null;
+		Cell right = null;
+		Cell left = null;
+		Cell bottom = null;
+		Cell up = null;
+		Cell downRightDiagonal = null;
+		Cell downLeftDiagonal = null;
+		Cell upRightDiagonal = null;
+		Cell upLeftDiagonal = null;
+		
+		for(int i=0; i<board.length; i++) {
+				for(int j=0; j<board[i].length; j++) {
+					 current = board[i][j];
+					 if(current.getValue() == null) continue;
+					 right = null;
+					 left = null;
+					 bottom = null;
+					 up = null;
+					 downLeftDiagonal = null;
+					 downRightDiagonal = null;
+					 upLeftDiagonal = null;
+					 upRightDiagonal = null;
+					 
+					 if(boundsCheck(i,j+1,board)) right = board[i][j+1];
+					 if(boundsCheck(i,j-1,board)) left = board[i][j-1]; 
+					 if(boundsCheck(i+1,j,board))  bottom = board[i+1][j];	 
+					 if(boundsCheck(i-1,j,board))  up = board[i-1][j];	 
+					 if(boundsCheck(i+1,j+1,board)) downRightDiagonal = board[i+1][j+1];
+					 if(boundsCheck(i-1,j+1,board)) upRightDiagonal = board[i-1][j+1];
+					 if(boundsCheck(i+1,j-1,board)) downLeftDiagonal = board[i+1][j-1];
+					 if(boundsCheck(i-1,j-1,board)) upLeftDiagonal = board[i-1][j-1];
+					 
+					 //(current,right) is an only edge case
+					 if(right != null && right.getValue() != null && right.getValue() - 1 == current.getValue()) {
+						 removeEdges(current,right);
+					 }
+					 
+					 //(current,left) is an only edge case
+					 if(left != null && left.getValue() != null &&left.getValue() - 1 == current.getValue()) {
+						 removeEdges(current,left);
+					 }
+					 
+					 //(current,bottom) is an only edge case
+					 if(bottom != null && bottom.getValue() != null && bottom.getValue() - 1 == current.getValue()) {
+						 removeEdges(current,bottom);
+					 }
+					 
+					 //(current,up) is an only edge case
+					 if(up != null && up.getValue() != null && up.getValue() - 1 == current.getValue()) {
+						 removeEdges(current,up);
+					 }
+					 
+					 //(current,downRightDiagonal) is an only edge case
+					 if(downRightDiagonal != null && downRightDiagonal.getValue() != null && downRightDiagonal.getValue() - 1 == current.getValue()) {
+						 removeEdges(current,downRightDiagonal);
+					 }
+					 
+					 //(current,upRightDiagonal) is an only edge case
+					 if(upRightDiagonal != null && upRightDiagonal.getValue() != null && upRightDiagonal.getValue() - 1 == current.getValue()) {
+						 removeEdges(current,upRightDiagonal);
+					 }
+					 
+					 //(current,downLeftDiagonal) is an only edge case
+					 if(downLeftDiagonal != null && downLeftDiagonal.getValue() != null && downLeftDiagonal.getValue() - 1 == current.getValue()) {
+						 removeEdges(current,downLeftDiagonal);
+					 }
+					 
+					 //(current,upLeftDiagonal) is an only edge case
+					 if(upLeftDiagonal != null && upLeftDiagonal.getValue() != null && upLeftDiagonal.getValue() - 1 == current.getValue()) {
+						 removeEdges(current,upLeftDiagonal);
+					 }
+				}
+		}
+	}
+
+	private void removeEdges(Cell current, Cell successor) {
+		Cell[][] board = hidato.getBoard();
+		Cell vertex = null;
+		successor.setIsPartOfHamiltonianPath(true);
+		lastCellBelongToHemiltonianPath = successor;
+		//remove all edges (X, successor) such that x != current
+		//if current is a part of hemiltonian cycle, then remove all (current, X) such that X != successor 
+		for(int i=0; i<board.length; i++) {
+			for(int j=0; j<board[i].length; j++) {
+				 vertex = board[i][j];
+	
+				 if(vertex.getIndex() != current.getIndex()) {
+						 GridGraph[vertex.getIndex()][successor.getIndex()] = 0;
+				 }
+				 
+				 if(current.isPartOfHamiltonianPath() && vertex.getIndex() != successor.getIndex()) {
+					 	 GridGraph[current.getIndex()][vertex.getIndex()] = 0;
+				 }
+			}
+		}	
+		//remove all edges (successor, X) 
+		 GridGraph[successor.getIndex()][current.getIndex()] = 0;	
+	}
+
+	private void removeEdgesToVertexWithValueOne() {
+		Cell[][] board = hidato.getBoard();
+		Cell vertex = null;
+		Cell one = null;
+		outer:
+		for(int i=0; i<board.length; i++) {
+			for(int j=0; j<board[i].length; j++) {
+				 if(board[i][j].getValue() != null && board[i][j].getValue() == 1) {
+					 one = board[i][j];
+					 break outer;
+				 }
+				
+			}
+		}	
+		
+		//remove all edges (X, V0) 
+		for(int i=0; i<board.length; i++) {
+			for(int j=0; j<board[i].length; j++) {
+				 vertex = board[i][j];
+				 GridGraph[vertex.getIndex()][one.getIndex()] = 0;
+			}
+		}	
+	}
+	 
+	public void convertHidatoToFullGridGraph() {
 		Cell[][] board = hidato.getBoard();
 		Cell current = null;
 		Cell right = null;
 		Cell bottom = null;
 		Cell downRightDiagonal = null;
 		Cell downLeftDiagonal = null;
-		boolean oneRightEdgeOnly = false,oneBottomEdgeOnly = false,oneDownRightDiagonalEdgeOnly = false,oneDownLeftDiagonalEdgeOnly = false;
 		
 		for(int i=0; i<board.length; i++) {
-			for(int j=0; j<board[i].length; j++) {
-				 current = board[i][j];
-				 right = null;
-				 bottom = null;
-				 downRightDiagonal = null;
-				 downLeftDiagonal = null;
-				 oneRightEdgeOnly = false;
-				 oneBottomEdgeOnly = false;
-				 oneDownRightDiagonalEdgeOnly = false;
-				 oneDownLeftDiagonalEdgeOnly = false;
-				 
-				 int currentIndex = current.getIndex();
-				 
-				 if(currentIndex == 3) {
-					 System.out.println();
-				 }
-				 if(boundsCheck(i,j+1,board)) {
-					if(isFirst) {
-						right = board[i][j+1];
-					} else {
-						right = board[i][j+1];
-						if(GridGraph[currentIndex][right.getIndex()] == 0 || !current.isPartOfHamiltonianPath())
-							right = null;
-					}
-				 }
-				 
-				 if(boundsCheck(i+1,j,board)) {
-					if(isFirst) {
-						bottom = board[i+1][j];
-					} else {
-						bottom = board[i+1][j];
-					    if(GridGraph[currentIndex][bottom.getIndex()] == 0 || !current.isPartOfHamiltonianPath())
-					    	bottom = null;
-					} 
-				 }
-				 
-				 if(boundsCheck(i+1,j+1,board)) {
-					if(isFirst) {
-						 downRightDiagonal = board[i + 1][j + 1];
-					} else {
-						downRightDiagonal = board[i + 1][j + 1];
-						if(GridGraph[currentIndex][downRightDiagonal.getIndex()] == 0 || !current.isPartOfHamiltonianPath())
-							downRightDiagonal = null;
-					}
-
-				 }
-				 
-				 if(boundsCheck(i+1,j-1,board)) {
-					if(isFirst) {
-						 downLeftDiagonal = board[i + 1][j - 1];
-					} else {
-						downLeftDiagonal = board[i + 1][j - 1];
-						if(GridGraph[currentIndex][downLeftDiagonal.getIndex()] == 0 || !current.isPartOfHamiltonianPath())
-							downLeftDiagonal = null;
-					}
+				for(int j=0; j<board[i].length; j++) {
+					 current = board[i][j];
+					 right = null;
+					 bottom = null;
+					 downLeftDiagonal = null;
+					 downRightDiagonal = null;
+					 
+					 if(boundsCheck(i,j+1,board)) {
+						 right = board[i][j+1];
+					 }
+					 
+					 if(boundsCheck(i+1,j,board)) {
+						 bottom = board[i+1][j];
+					 }
+					 
+					 if(boundsCheck(i+1,j+1,board)) {
+						 downRightDiagonal = board[i+1][j+1];
+					 }
 					
-				 }
-
-				 GridGraph[currentIndex][currentIndex] = 1; //every vertex is connected to itself... trivial 
-				 
-				 if(current.getValue() != null) {
-					 if(right != null && right.getValue() != null &&  (right.getValue().intValue() + 1 == current.getValue().intValue() || right.getValue().intValue() - 1 == current.getValue().intValue()))
-						 oneRightEdgeOnly = true;
-					 
-					 if(bottom != null && bottom.getValue() != null &&  (bottom.getValue().intValue() + 1 == current.getValue().intValue() || bottom.getValue().intValue() - 1 == current.getValue().intValue()))
-						 oneBottomEdgeOnly = true;
-					 
-					 if(downRightDiagonal != null && downRightDiagonal.getValue() != null && (downRightDiagonal.getValue().intValue() + 1 == current.getValue().intValue() || downRightDiagonal.getValue().intValue() - 1 == current.getValue().intValue()))
-						 oneDownRightDiagonalEdgeOnly = true;
-					 
-					 if(downLeftDiagonal != null && downLeftDiagonal.getValue() != null &&  (downLeftDiagonal.getValue().intValue() + 1 == current.getValue().intValue() || downLeftDiagonal.getValue().intValue() - 1 == current.getValue().intValue()))
-						 oneDownLeftDiagonalEdgeOnly = true;
-				 }
-				 
-					 
-				 boolean oneEdgeOnly = oneRightEdgeOnly || oneBottomEdgeOnly || oneDownRightDiagonalEdgeOnly || oneDownLeftDiagonalEdgeOnly;
-				 
-				 if(oneEdgeOnly) {
-					 if(oneRightEdgeOnly) {
-						 if(!current.isPartOfHamiltonianPath()) {
-							 Arrays.fill(GridGraph[currentIndex], 0);
-						 	 for(int k = 0; k < GridGraph[0].length; k++)
-						 		 GridGraph[k][currentIndex] = 0;
-						 }
-						 
-						 GridGraph[currentIndex][currentIndex] = 1;
-						 
-						 GridGraph[currentIndex][right.getIndex()] = 1;
-						 GridGraph[right.getIndex()][currentIndex] = 1;
-						 current.setIsPartOfHamiltonianPath(true);
-						 right.setIsPartOfHamiltonianPath(true);
-						 						 connectNeighbors(current, right, bottom, downRightDiagonal, downLeftDiagonal, currentIndex,
-									oneEdgeOnly);	
-						 continue;
-					 }
-					 if(oneBottomEdgeOnly) {
-						 if(!current.isPartOfHamiltonianPath()) {
-							 Arrays.fill(GridGraph[currentIndex], 0);
-							 for(int k = 0; k < GridGraph[0].length; k++)
-								 GridGraph[k][currentIndex] = 0;
-						 }
-						 
-						 GridGraph[currentIndex][currentIndex] = 1; 
-						 GridGraph[currentIndex][bottom.getIndex()] = 1;
-						 GridGraph[bottom.getIndex()][currentIndex] = 1;
-						 current.setIsPartOfHamiltonianPath(true);
-						 bottom.setIsPartOfHamiltonianPath(true);
-						 connectNeighbors(current, right, bottom, downRightDiagonal, downLeftDiagonal, currentIndex,
-									oneEdgeOnly);	
-						 continue;
-					 }
-					 if(oneDownRightDiagonalEdgeOnly) {
-						 if(!current.isPartOfHamiltonianPath()) {
-							 Arrays.fill(GridGraph[currentIndex], 0);
-							 for(int k = 0; k < GridGraph[0].length; k++)
-								 GridGraph[k][currentIndex] = 0;
-						 }
-						 
-						 GridGraph[currentIndex][currentIndex] = 1;
-						 GridGraph[currentIndex][downRightDiagonal.getIndex()] = 1;
-						 GridGraph[downRightDiagonal.getIndex()][currentIndex] = 1;
-						 current.setIsPartOfHamiltonianPath(true);
-						 downRightDiagonal.setIsPartOfHamiltonianPath(true);
-						 connectNeighbors(current, right, bottom, downRightDiagonal, downLeftDiagonal, currentIndex,
-									oneEdgeOnly);	
-						 continue;
-					 }
-					 if(oneDownLeftDiagonalEdgeOnly) {
-						 if(!current.isPartOfHamiltonianPath()) {
-							 Arrays.fill(GridGraph[currentIndex], 0);
-							 for(int k = 0; k < GridGraph[0].length; k++)
-								 GridGraph[k][currentIndex] = 0;
-						 }
-						 
-						 GridGraph[currentIndex][currentIndex] = 1;
-						 GridGraph[currentIndex][downLeftDiagonal.getIndex()] = 1;
-						 GridGraph[downLeftDiagonal.getIndex()][currentIndex] = 1;
-						 current.setIsPartOfHamiltonianPath(true);
-						 downLeftDiagonal.setIsPartOfHamiltonianPath(true);
-						 connectNeighbors(current, right, bottom, downRightDiagonal, downLeftDiagonal, currentIndex,
-									oneEdgeOnly);	
-						 continue;
-					 }		 
-				 } else {
-						 connectNeighbors(current, right, bottom, downRightDiagonal, downLeftDiagonal, currentIndex,
-								oneEdgeOnly);	
-				 }
-			}
+					 if(boundsCheck(i+1,j-1,board)) {
+						 downLeftDiagonal = board[i+1][j-1];
+					 }	 
+					 connectNeighborsIfExists(current,right,bottom,downRightDiagonal,downLeftDiagonal);
+				}
 		}
 	}
 
-	private void connectNeighbors(Cell current, Cell right, Cell bottom, Cell downRightDiagonal, Cell downLeftDiagonal,
-			int currentIndex, boolean oneEdgeOnly) {
-		//if a righty neighbor exists
+	private void connectNeighborsIfExists(Cell current, Cell right, Cell bottom, Cell downRightDiagonal, Cell downLeftDiagonal) {
+		 GridGraph[current.getIndex()][current.getIndex()] = 1;
+		 
 		 if(right != null) { 
-			 //the right neighbor is connected to him
-			 GridGraph[currentIndex][right.getIndex()] = 1;
-			 GridGraph[right.getIndex()][currentIndex] = 1;
+			 GridGraph[current.getIndex()][right.getIndex()] = 1;
+			 GridGraph[right.getIndex()][current.getIndex()] = 1;
 		 }
 		 
-		 //if a bottom neighbor exists
 		 if(bottom != null) {		 
-			 //the right neighbor is connected to him
-			 GridGraph[currentIndex][bottom.getIndex()] = 1;
-			 GridGraph[bottom.getIndex()][currentIndex] = 1;
+			 GridGraph[current.getIndex()][bottom.getIndex()] = 1;
+			 GridGraph[bottom.getIndex()][current.getIndex()] = 1;
 		 }
 		 
-		 //if a down right diagonal neighbor exists
 		 if(downRightDiagonal != null) {
-			 //the right neighbor is connected to him
-			 GridGraph[currentIndex][downRightDiagonal.getIndex()] = 1;
-			 GridGraph[downRightDiagonal.getIndex()][currentIndex] = 1;
+			 GridGraph[current.getIndex()][downRightDiagonal.getIndex()] = 1;
+			 GridGraph[downRightDiagonal.getIndex()][current.getIndex()] = 1;
 		 }
 		 
-		 //if a down left diagonal neighbor exists
 		 if(downLeftDiagonal != null) {
-			 //the right neighbor is connected to him
-			 GridGraph[currentIndex][downLeftDiagonal.getIndex()] = 1;
-			 GridGraph[downLeftDiagonal.getIndex()][currentIndex] = 1;
+			 GridGraph[current.getIndex()][downLeftDiagonal.getIndex()] = 1;
+			 GridGraph[downLeftDiagonal.getIndex()][current.getIndex()] = 1;
 		 }
 	}
 
 	public static boolean boundsCheck(int i, int j, Cell[][] arr) {
-		return (i >= 0 && j >=0 && i < arr.length && j < arr[0].length);
+		boolean flag = (i>=0);
+		//System.out.println("flag1 = " + flag);
+		flag &= (j >= 0);
+		//System.out.println("flag2 = " + flag);
+		flag &= (i < arr.length);
+		//System.out.println("flag3 = " + flag);
+		flag &= (j < arr[0].length);
+		//System.out.println("flag4 = " + flag);
+		return flag;
 	}
 	
 	public static void displayGridGraph(int[][] GridGraph) {
+		System.out.println();
 		for(int i=0; i<GridGraph.length; i++) {
 			for(int j=0; j<GridGraph[i].length; j++) {
 				System.out.print(GridGraph[i][j] + " ");
 			}
 			System.out.println();
 		}
+		System.out.println();
 	}
 }

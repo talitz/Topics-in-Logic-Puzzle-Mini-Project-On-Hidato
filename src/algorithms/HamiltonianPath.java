@@ -27,7 +27,7 @@ public class HamiltonianPath
         
         for(int i=0; i<V; i++)
         	for(int j=0; j<V; j++)
-        		  graph[i][j] = g[i][j];
+        		  graph[i][j] = g[i][j];	
 
         try {            
             path[0] = 0;
@@ -49,25 +49,25 @@ public class HamiltonianPath
            return;
         
     	
-        System.out.println("start with vertex v = "+vertex);
-        System.out.println("trying to find the best neighbor we can!");
+       // System.out.println("start with vertex v = "+vertex);
+      //  System.out.println("trying to find the best neighbor we can!");
    	 int neighborFound = -1;
    	 for (int t = 0; t < V; t++) {
-   		 System.out.println("checking ("+vertex+","+t+")");
-   		 System.out.println("graph[vertex][t] " + graph[vertex][t]);
-   		 System.out.println("pathCount " + pathCount);
+   		// System.out.println("checking ("+vertex+","+t+")");
+   		// System.out.println("graph[vertex][t] " + graph[vertex][t]);
+   	//	 System.out.println("pathCount " + pathCount);
    		 if(vertex != t && graph[vertex][t] == 1 && vertexValues[t] != -1 && vertexValues[t] == pathCount+1) {
-   			 System.out.println("vertex = "+vertex + " is connected to vertex t="+t);
-   			 System.out.println("t's value is = "+vertexValues[t]);
+   			// System.out.println("vertex = "+vertex + " is connected to vertex t="+t);
+   			// System.out.println("t's value is = "+vertexValues[t]);
    			 neighborFound = t;
    			 break;
    		 }
    	 }
    	 
-   	 System.out.println();
+   	// System.out.println();
 
 	 if(neighborFound != -1) {
-		     System.out.println("we found the right neighbor to continue with: neighborFound = "+neighborFound);
+		    // System.out.println("we found the right neighbor to continue with: neighborFound = "+neighborFound);
              /** add to path **/            
              path[pathCount++] = neighborFound;    
 
@@ -87,15 +87,12 @@ public class HamiltonianPath
              path[--pathCount] = -1;  
 		 
 	 } else {
-		 System.out.println("we did not found the right neighbor to continue with: neighborFound = "+neighborFound);
-        for (int v = 0; v < V; v++) {
-
-    		    
-    		     
+		 //System.out.println("we did not found the right neighbor to continue with: neighborFound = "+neighborFound);
+        for (int v = 0; v < V; v++) { 
                  /** if connected **/
                  if (graph[vertex][v] == 1 && vertexValues[v] == -1 ) {
                  
-                	 System.out.println("connecting  ("+vertex + "," + v+")");
+                	 //System.out.println("connecting  ("+vertex + "," + v+")");
                      /** add to path **/            
                      path[pathCount++] = v;    
 

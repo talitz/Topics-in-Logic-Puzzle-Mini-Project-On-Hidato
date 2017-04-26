@@ -3,6 +3,7 @@ package hidato;
 import java.util.ArrayList;
 
 public class Hidato {
+	
 	private int start;
     private int end;
     private Cell[][] board;
@@ -62,6 +63,11 @@ public class Hidato {
     public ArrayList<Integer> getExistingValues() {
 		return existingValues;
 	}
+    
+    public ArrayList<Integer> getNonExistingValues() {
+		return nonExistingValues;
+	}
+	
 	
 	public Cell getCellByVertexIndex(int index) {
 		for(int i=0; i<board.length; i++) {
@@ -74,21 +80,12 @@ public class Hidato {
 		return null;
 	}
 
-	public void setRunner() {
-		runner = -1;
-	}
-	
-	public int tryToMatchValueToCell(int vertexIndex) {
-		runner = (runner + 1)%end;
-		return (int) nonExistingValues.get(runner);
-	}
-
 	public void addToExistingValue(int valueToTry) {
 		existingValues.add(valueToTry);	
 		nonExistingValues.remove(nonExistingValues.indexOf(valueToTry));
 	}
 	
-	public void setCellWithNewValue(int index, int value) {
+	public void setCellWithNewValue(int index, Integer value) {
 		for(int i=0; i<board.length; i++) {
 			for(int j=0;j<board[i].length;j++) {
 				Cell current = board[i][j];

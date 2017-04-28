@@ -2,157 +2,134 @@ package algorithms;
 
 import java.util.Arrays;
 
-public class HamiltonianPath
+public class HamiltonianPath {
 
-{
-    private int V, pathCount;
+	private int V, pathCount;
+	private int[] path;     
+	private int[][] graph;
 
-    private int[] path;     
+	public String isHamiltonianPath(int[][] g,int[] vertexValues) {
+		String path = findHamiltonianPath(g,vertexValues); 
+		return path.equals("No solution")? null : path;	
+	}
 
-    private int[][] graph;
+	public String findHamiltonianPath(int[][] g, int[] vertexValues) {
+		V = g.length;
+		path = new int[V];
+		Arrays.fill(path, -1);
 
-    public String isHamiltonianPath(int[][] g,int[] vertexValues)
+		graph = new int[V][V];
 
-    {
-    	String path = findHamiltonianPath(g,vertexValues); 
-    	return path.equals("No solution")? null : path;	
-    }
-    
-    public String findHamiltonianPath(int[][] g, int[] vertexValues) {
-        V = g.length;
-        path = new int[V];
-        Arrays.fill(path, -1);
-        
-        graph = new int[V][V];
-        
-        for(int i=0; i<V; i++)
-        	for(int j=0; j<V; j++)
-        		  graph[i][j] = g[i][j];	
+		for(int i=0; i<V; i++)
+			for(int j=0; j<V; j++)
+				graph[i][j] = g[i][j];	
 
-        try {            
-            path[0] = 0;
-            pathCount = 1;            
-            solve(0,vertexValues);
-            return("No solution");
-        } catch (Exception e) {
-            return(display());
-        }
-    }
+		try {            
+			path[0] = 0;
+			pathCount = 1;            
+			solve(0,vertexValues);
+			return("No solution");
+		} catch (Exception e) {
+			return(display());
+		}
+	}
 
-    public void solve(int vertex,int[] vertexValues) throws Exception {
-        /** solution **/
-        if (pathCount == V)
-            throw new Exception();
+	public void solve(int vertex,int[] vertexValues) throws Exception {
+		/** solution **/
+		if (pathCount == V)
+			throw new Exception();
 
-        /** all vertices selected but last vertex not linked to 0 **/
-        if (pathCount == V)
-           return;
-        
-    	
-       // System.out.println("start with vertex v = "+vertex);
-      //  System.out.println("trying to find the best neighbor we can!");
-   	 int neighborFound = -1;
-   	 for (int t = 0; t < V; t++) {
-   		// System.out.println("checking ("+vertex+","+t+")");
-   		// System.out.println("graph[vertex][t] " + graph[vertex][t]);
-   	//	 System.out.println("pathCount " + pathCount);
-   		 if(vertex != t && graph[vertex][t] == 1 && vertexValues[t] != -1 && vertexValues[t] == pathCount+1) {
-   			// System.out.println("vertex = "+vertex + " is connected to vertex t="+t);
-   			// System.out.println("t's value is = "+vertexValues[t]);
-   			 neighborFound = t;
-   			 break;
-   		 }
-   	 }
-   	 
-   	// System.out.println();
+		/** all vertices selected but last vertex not linked to 0 **/
+		if (pathCount == V)
+			return;
 
-	 if(neighborFound != -1) {
-		    // System.out.println("we found the right neighbor to continue with: neighborFound = "+neighborFound);
-             /** add to path **/            
-             path[pathCount++] = neighborFound;    
+		int neighborFound = -1;
+		for (int t = 0; t < V; t++) {
+			if(vertex != t && graph[vertex][t] == 1 && vertexValues[t] != -1 && vertexValues[t] == pathCount+1) {
+				neighborFound = t;
+				break;
+			}
+		}
 
-             /** remove connection **/            
-             graph[vertex][neighborFound] = 0;
-             graph[neighborFound][vertex] = 0;
+		if(neighborFound != -1) {
+			/** add to path **/            
+			path[pathCount++] = neighborFound;    
 
-             /** if vertex not already selected  solve recursively **/
-             if (!isPresent(neighborFound))
-                 solve(neighborFound,vertexValues);
+			/** remove connection **/            
+			graph[vertex][neighborFound] = 0;
+			graph[neighborFound][vertex] = 0;
 
-             /** restore connection **/
-             graph[vertex][neighborFound] = 1;
-             graph[neighborFound][vertex] = 1;
+			/** if vertex not already selected  solve recursively **/
+			if (!isPresent(neighborFound))
+				solve(neighborFound,vertexValues);
 
-             /** remove path **/
-             path[--pathCount] = -1;  
-		 
-	 } else {
-		 //System.out.println("we did not found the right neighbor to continue with: neighborFound = "+neighborFound);
-        for (int v = 0; v < V; v++) { 
-                 /** if connected **/
-                 if (graph[vertex][v] == 1 && vertexValues[v] == -1 ) {
-                 
-                	 //System.out.println("connecting  ("+vertex + "," + v+")");
-                     /** add to path **/            
-                     path[pathCount++] = v;    
+			/** restore connection **/
+			graph[vertex][neighborFound] = 1;
+			graph[neighborFound][vertex] = 1;
 
-                     /** remove connection **/            
-                     graph[vertex][v] = 0;
-                     graph[v][vertex] = 0;
+			/** remove path **/
+			path[--pathCount] = -1;  
 
-                     /** if vertex not already selected  solve recursively **/
-                     if (!isPresent(v))
-                         solve(v,vertexValues);
+		} else {
+			for (int v = 0; v < V; v++) { 
+				/** if connected **/
+				if (graph[vertex][v] == 1 && vertexValues[v] == -1 ) {
+					/** add to path **/            
+					path[pathCount++] = v;    
 
-                     /** restore connection **/
-                     graph[vertex][v] = 1;
-                     graph[v][vertex] = 1;
+					/** remove connection **/            
+					graph[vertex][v] = 0;
+					graph[v][vertex] = 0;
 
-                     /** remove path **/
-                     path[--pathCount] = -1;                    
-                 }
-        	 }
+					/** if vertex not already selected  solve recursively **/
+					if (!isPresent(v))
+						solve(v,vertexValues);
 
-        }
-    }
+					/** restore connection **/
+					graph[vertex][v] = 1;
+					graph[v][vertex] = 1;
+
+					/** remove path **/
+					path[--pathCount] = -1;                    
+				}
+			}
+
+		}
+	}
 
 
-    public boolean isPresent(int v) {
-        for (int i = 0; i < pathCount - 1; i++)
-            if (path[i] == v)
-                return true;
-        return false;                
-    }
+	public boolean isPresent(int v) {
+		for (int i = 0; i < pathCount - 1; i++)
+			if (path[i] == v)
+				return true;
+		return false;                
+	}
 
-    public String display() {
-    	StringBuilder ans = new StringBuilder("");
-        for (int i = 0; i < V; i++) {
-            ans.append(path[i % V]);
-            if(i != V-1) {
-            	ans.append(";");
-            } 
-        }
+	public String display() {
+		StringBuilder ans = new StringBuilder("");
+		for (int i = 0; i < V; i++) {
+			ans.append(path[i % V]);
+			if(i != V-1) {
+				ans.append(";");
+			} 
+		}
 
-        return ans.toString();
-    }  
-    
-
-    public static void main (String[] args)  {
-        HamiltonianPath hc = new HamiltonianPath();
-
-        int[][] graph =         {   {1 ,1 ,1 ,1 ,0},
-        							{0 ,1 ,1 ,0 ,1},
-        							{0 ,1 ,1 ,1 ,1},
-        							{0 ,0 ,1 ,1, 1},
-        							{0 ,0 ,0 ,0, 1}
-        											};
+		return ans.toString();
+	}  
 
 
-        
-        int[] vertexValues = {1,-1,3,4,5};
-        System.out.println(hc.isHamiltonianPath(graph,vertexValues));
-    //    System.out.println(hc.findHamiltonianPath(graph,vertexValues));        
+	public static void main (String[] args)  {
+		HamiltonianPath hc = new HamiltonianPath();
 
-    }    
+		int[][] graph =         {   {1 ,1 ,1 ,1 ,0},
+				{0 ,1 ,1 ,0 ,1},
+				{0 ,1 ,1 ,1 ,1},
+				{0 ,0 ,1 ,1, 1},
+				{0 ,0 ,0 ,0, 1}
+		};
+
+		int[] vertexValues = {1,-1,3,4,5};
+		System.out.println(hc.isHamiltonianPath(graph,vertexValues));
+	}    
 
 }

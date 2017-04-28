@@ -7,12 +7,9 @@ public class Hidato {
 	private int start;
 	private int end;
 	private Cell[][] board;
-	@SuppressWarnings("rawtypes")
 	private ArrayList<Integer> existingValues = new ArrayList<Integer>();
 	private ArrayList<Integer> nonExistingValues = new ArrayList<Integer>();
-	private int runner = -1;
 
-	@SuppressWarnings("unchecked")
 	public Hidato(int start, int end, Cell[][] board) {
 		super();
 		this.start = start;

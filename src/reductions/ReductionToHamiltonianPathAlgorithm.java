@@ -22,7 +22,7 @@ public class ReductionToHamiltonianPathAlgorithm {
 		this.board = hidato.getBoard();
 		vertexValues = new int[this.GridGraph.length];
 		missingValues = hidato.getNonExistingValues();
-		one = hidato.getCellByVertexValue(hidato.getStart());
+		one = hidato.getCellByVertexValueIfExistsOrNull(hidato.getStart());
 		one.setIsPartOfHamiltonianPath(true);
 	}
 
@@ -36,7 +36,7 @@ public class ReductionToHamiltonianPathAlgorithm {
 		removeEdgesToVertexWithValueOne();
 
 		removeEdgesAmongNeighborsWithSuccessorValues();
-		//displayGridGraph(GridGraph);
+		displayGridGraph(GridGraph);
 		HamiltonianPath hamiltonianPathAlgorithm = new HamiltonianPath();
 
 		constructVertexValues();
@@ -61,7 +61,7 @@ public class ReductionToHamiltonianPathAlgorithm {
 				hidato.setCellWithNewValue(index, nextMissingValue);
 				System.out.println(hidato);
 				constructVertexValues();
-				path = hamiltonianPathAlgorithm.isHamiltonianPath(GridGraph,vertexValues);
+				path = hamiltonianPathAlgorithm.isHamiltonianPath(GridGraph,vertexValues,one.getIndex());
 				while(path == null) {
 					
 					hidato.setCellWithNewValue(index, null); //this value didn't work for us...
@@ -73,7 +73,7 @@ public class ReductionToHamiltonianPathAlgorithm {
 						hidato.setCellWithNewValue(firstToPutAt.getIndex(), nextMissingValue);
 						System.out.println(hidato);
 						constructVertexValues();
-						path = hamiltonianPathAlgorithm.isHamiltonianPath(GridGraph,vertexValues);
+						path = hamiltonianPathAlgorithm.isHamiltonianPath(GridGraph,vertexValues,one.getIndex());
 					}
 				}
 
@@ -107,7 +107,8 @@ public class ReductionToHamiltonianPathAlgorithm {
 			for(int j=0; j<board[i].length; j++) {
 				Cell curr = board[i][j];
 				if(curr.getValue() != null && curr.getValue() == b-1) {
-					return board[i][j];				}
+					return board[i][j];				
+				}
 			}
 		}	
 		return null;
@@ -186,7 +187,6 @@ public class ReductionToHamiltonianPathAlgorithm {
 		Cell[][] board = hidato.getBoard();
 		Cell vertex = null;
 		successor.setIsPartOfHamiltonianPath(true);
-		nextCellToCalculateHemiltonianPath = successor;
 		//remove all edges (X, successor) such that x != current
 		//remove all (current, X) such that X != successor 
 		for(int i=0; i<board.length; i++) {
@@ -200,7 +200,7 @@ public class ReductionToHamiltonianPathAlgorithm {
 					}
 				}
 
-				if(vertex.getIndex() != successor.getIndex()) {
+				if(current.isPartOfHamiltonianPath() && vertex.getIndex() != successor.getIndex()) {
 					if(GridGraph[current.getIndex()][vertex.getIndex()] == 1) {
 						GridGraph[current.getIndex()][vertex.getIndex()] = 0;
 					}

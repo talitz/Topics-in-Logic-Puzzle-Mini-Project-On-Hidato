@@ -8,12 +8,12 @@ public class HamiltonianPath {
 	private int[] path;     
 	private int[][] graph;
 
-	public String isHamiltonianPath(int[][] g,int[] vertexValues) {
-		String path = findHamiltonianPath(g,vertexValues); 
+	public String isHamiltonianPath(int[][] g,int[] vertexValues,int startPathFromVertexWithIndex) {
+		String path = findHamiltonianPath(g,vertexValues,startPathFromVertexWithIndex); 
 		return path.equals("No solution")? null : path;	
 	}
 
-	public String findHamiltonianPath(int[][] g, int[] vertexValues) {
+	public String findHamiltonianPath(int[][] g, int[] vertexValues,int startPathFromVertexWithIndex) {
 		V = g.length;
 		path = new int[V];
 		Arrays.fill(path, -1);
@@ -25,9 +25,9 @@ public class HamiltonianPath {
 				graph[i][j] = g[i][j];	
 
 		try {            
-			path[0] = 0;
+			path[0] = startPathFromVertexWithIndex;
 			pathCount = 1;            
-			solve(0,vertexValues);
+			solve(path[0],vertexValues);
 			return("No solution");
 		} catch (Exception e) {
 			return(display());
@@ -129,7 +129,7 @@ public class HamiltonianPath {
 		};
 
 		int[] vertexValues = {1,-1,3,4,5};
-		System.out.println(hc.isHamiltonianPath(graph,vertexValues));
+		System.out.println(hc.isHamiltonianPath(graph,vertexValues,0));
 	}    
 
 }

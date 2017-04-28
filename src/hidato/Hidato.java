@@ -77,7 +77,7 @@ public class Hidato {
 		return null;
 	}
 	
-	public Cell getCellByVertexValue(int value) {
+	public Cell getCellByVertexValueIfExistsOrNull(int value) {
 		for(int i=0; i<board.length; i++) {
 			for(int j=0;j<board[i].length;j++) {
 				Cell current = board[i][j];

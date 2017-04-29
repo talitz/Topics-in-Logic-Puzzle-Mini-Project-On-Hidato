@@ -36,7 +36,7 @@ public class ReductionToHamiltonianPathAlgorithm {
 		removeEdgesToVertexWithValueOne();
 
 		removeEdgesAmongNeighborsWithSuccessorValues();
-		displayGridGraph(GridGraph);
+		//displayGridGraph(GridGraph);
 		HamiltonianPath hamiltonianPathAlgorithm = new HamiltonianPath();
 
 		constructVertexValues();
@@ -81,6 +81,7 @@ public class ReductionToHamiltonianPathAlgorithm {
 				firstToPutAt.setIsPartOfHamiltonianPath(true);
 				nextCellToCalculateHemiltonianPath = calculateNextCellToFindHemiltonianPath(nextMissingValue);
 			} else {
+				if(neighborsIndexesToPutAt.isEmpty()) return "There is no solution for this Hidato riddle!";
 				missingValues.add(nextMissingValue);
 				Collections.sort(missingValues);
 			}
@@ -89,8 +90,8 @@ public class ReductionToHamiltonianPathAlgorithm {
 		System.out.println(hidato);
 		long endTime   = System.currentTimeMillis();
 		long totalTime = endTime - startTime;
-		System.out.println("It took "+totalTime/1000 + " seconds for this algorithm to end");
-		return path;    
+		System.out.println("It took "+totalTime/1000 + " seconds for this algorithm to end!");
+		return "Hidato's path: " + path;    
 
 	}
 

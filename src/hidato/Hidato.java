@@ -10,12 +10,30 @@ public class Hidato {
 	private ArrayList<Integer> existingValues = new ArrayList<Integer>();
 	private ArrayList<Integer> nonExistingValues = new ArrayList<Integer>();
 
-	public Hidato(int start, int end, Cell[][] board) {
+	public Hidato(int start, int end, Cell[][] board) throws Exception{
 		super();
 		this.start = start;
 		this.end = end;
 		this.board = board;
 
+		if(start != 1 || end != board.length*board.length) 
+			throw new Exception("Hidato Exception :: Start/end values doesn't make sense.");
+		
+		boolean foundStart = false, foundEnd = false;
+		
+		for(int i=0; i<board.length; i++) {
+			for(int j=0; j<board.length;j++) {
+				Cell current = board[i][j];
+				if(current.getValue() != null && (current.getValue() > this.end || current.getValue() < this.start)) {
+					throw new Exception("Hidato Exception :: You can't create a Hidato puzzle with values not between startValue <= X <= endValue!");
+				}
+				if(current.getValue() != null && current.getValue() == this.start) foundStart = true;
+				if(current.getValue() != null && current.getValue() == this.end) foundEnd = true;
+			}
+		}
+		
+		if(foundStart == false || foundEnd == false) throw new Exception("Hidato Exception :: start or end value doesn't exist in the board.");
+	
 		//when we create the Hidato riddle, it is useful to have all its current existing values
 		for(int i=0; i<board.length; i++) {
 			for(int j=0; j<board.length;j++) {
@@ -106,8 +124,8 @@ public class Hidato {
 
 	public String toString() {
 		String ans = "\n";
-		ans += "start = " + start + ", end = "+end + "\n";
-		ans += "existing values: ";
+		ans += "Start = " + start + ", End = "+end + "\n";
+		ans += "Existing values: {";
 
 		for(int i=0; i< existingValues.size(); i++) {
 			if(i < existingValues.size()-1) {
@@ -117,8 +135,8 @@ public class Hidato {
 			}
 		}
 
-		ans += "\n";
-		ans += "non existing values: ";
+		ans += "}\n";
+		ans += "Non existing values: {";
 
 		for(int i=0; i< nonExistingValues.size(); i++) {
 			if(i < nonExistingValues.size()-1) {
@@ -128,11 +146,18 @@ public class Hidato {
 			}
 		}
 
-		ans += "\n";
+		ans += "}\n\n";
 
 		for(int i=0; i<board.length; i++) {
 			for(int j=0; j<board[i].length; j++) {
-				ans += (board[i][j].getValue() == null) ? "_"+ "       " :  board[i][j].getValue() + "       ";
+				Integer currValue = board[i][j].getValue();
+				if(currValue == null) {
+					ans += "_"+ "        ";
+				} else if(currValue.intValue() > 9){ 
+					ans += board[i][j].getValue() + "       ";
+				} else {
+					ans += board[i][j].getValue() + "        ";
+				}
 			}
 			ans += "\n";
 		}

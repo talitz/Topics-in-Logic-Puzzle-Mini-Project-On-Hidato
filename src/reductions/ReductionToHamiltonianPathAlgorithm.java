@@ -1,7 +1,4 @@
 package reductions;
-import java.util.ArrayList;
-import java.util.Collections;
-
 import algorithms.HamiltonianPath;
 import hidato.Cell;
 import hidato.Hidato;
@@ -10,20 +7,16 @@ public class ReductionToHamiltonianPathAlgorithm {
 
 	private int[][] GridGraph;
 	private Hidato hidato;
-	private Cell nextCellToCalculateHemiltonianPath = null;
 	private Cell[][] board = null;
 	int [] vertexValues = null;
 	private Cell one;
-	private ArrayList<Integer> missingValues = null;
 	
 	public ReductionToHamiltonianPathAlgorithm(Hidato hidato) {
 		this.GridGraph = new int[hidato.getEnd()][hidato.getEnd()];
 		this.hidato = hidato;
 		this.board = hidato.getBoard();
 		vertexValues = new int[this.GridGraph.length];
-		missingValues = hidato.getNonExistingValues();
 		one = hidato.getCellByVertexValueIfExistsOrNull(hidato.getStart());
-		one.setIsPartOfHamiltonianPath(true);
 	}
 
 	public String setAndRunReductionToHamiltonPathAlgorithm() {  
@@ -43,51 +36,22 @@ public class ReductionToHamiltonianPathAlgorithm {
 
 		String path = null;
 
-		while(!missingValues.isEmpty()) {
-			Integer nextMissingValue = missingValues.remove(0);
-			ArrayList<Integer> neighborsIndexesToPutAt = new ArrayList<Integer>();
-			nextCellToCalculateHemiltonianPath = calculateNextCellToFindHemiltonianPath(nextMissingValue);
-			Cell current = nextCellToCalculateHemiltonianPath; 
-			
-			for(int k = 0; k < hidato.getEnd(); k++) {
-				if(GridGraph[current.getIndex()][k] == 1 && hidato.getCellByVertexIndex(k).getValue() == null) {
-					neighborsIndexesToPutAt.add(k);
-				}
-			}
-
-			int index = !neighborsIndexesToPutAt.isEmpty() ? neighborsIndexesToPutAt.remove(0) : -1;
-			if(index != -1) {	
-				Cell firstToPutAt = hidato.getCellByVertexIndex(index);
-				hidato.setCellWithNewValue(index, nextMissingValue);
-				System.out.println(hidato);
-				constructVertexValues();
-				path = hamiltonianPathAlgorithm.isHamiltonianPath(GridGraph,vertexValues,one.getIndex());
-				while(path == null) {
-					
-					hidato.setCellWithNewValue(index, null); //this value didn't work for us...
-					System.out.println(hidato);
-					if(neighborsIndexesToPutAt.isEmpty()) return "There is no solution for this Hidato riddle!";
-					else {
-						index = neighborsIndexesToPutAt.remove(0);
-						firstToPutAt = hidato.getCellByVertexIndex(index);
-						hidato.setCellWithNewValue(firstToPutAt.getIndex(), nextMissingValue);
-						System.out.println(hidato);
-						constructVertexValues();
-						path = hamiltonianPathAlgorithm.isHamiltonianPath(GridGraph,vertexValues,one.getIndex());
+		path = hamiltonianPathAlgorithm.isHamiltonianPath(GridGraph,vertexValues,one.getIndex());
+		
+		if(path != null) {
+			String[] parts = path.split(";");
+						
+			for(int i=0; i<parts.length; i++) {
+					int cellIndex = Integer.parseInt(parts[i]);
+					if(!hidato.isCellWithExistingValue(cellIndex)) {
+						hidato.setCellWithNewValue(cellIndex, Integer.valueOf(i)+1);
 					}
-				}
-
-				removeEdgesAmongNeighborsWithSuccessorValues();
-				firstToPutAt.setIsPartOfHamiltonianPath(true);
-				nextCellToCalculateHemiltonianPath = calculateNextCellToFindHemiltonianPath(nextMissingValue);
-			} else {
-				if(neighborsIndexesToPutAt.isEmpty()) return "There is no solution for this Hidato riddle!";
-				missingValues.add(nextMissingValue);
-				Collections.sort(missingValues);
 			}
-
+			System.out.println("The solution for this Hidato riddle:");
+			System.out.println(hidato);
+		} else {
+			System.out.println("There is no solution for this Hidato riddle!");
 		}
-		System.out.println(hidato);
 		long endTime   = System.currentTimeMillis();
 		long totalTime = endTime - startTime;
 		System.out.println("It took "+totalTime/1000 + " seconds for this algorithm to end!");
@@ -101,18 +65,6 @@ public class ReductionToHamiltonianPathAlgorithm {
 			if(curr.getValue() == null) vertexValues[i] = -1;
 			else vertexValues[i] = curr.getValue();	    
 		}
-	}
-
-	private Cell calculateNextCellToFindHemiltonianPath(int b) {
-		for(int i=0; i<board.length; i++) {
-			for(int j=0; j<board[i].length; j++) {
-				Cell curr = board[i][j];
-				if(curr.getValue() != null && curr.getValue() == b-1) {
-					return board[i][j];				
-				}
-			}
-		}	
-		return null;
 	}
 
 	private void removeEdgesAmongNeighborsWithSuccessorValues() {
@@ -187,7 +139,6 @@ public class ReductionToHamiltonianPathAlgorithm {
 	private void removeEdges(Cell current, Cell successor) {
 		Cell[][] board = hidato.getBoard();
 		Cell vertex = null;
-		successor.setIsPartOfHamiltonianPath(true);
 		//remove all edges (X, successor) such that x != current
 		//remove all (current, X) such that X != successor 
 		for(int i=0; i<board.length; i++) {
@@ -201,7 +152,7 @@ public class ReductionToHamiltonianPathAlgorithm {
 					}
 				}
 
-				if(current.isPartOfHamiltonianPath() && vertex.getIndex() != successor.getIndex()) {
+				if(vertex.getIndex() != successor.getIndex()) {
 					if(GridGraph[current.getIndex()][vertex.getIndex()] == 1) {
 						GridGraph[current.getIndex()][vertex.getIndex()] = 0;
 					}

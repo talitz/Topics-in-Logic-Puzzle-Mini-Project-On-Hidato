@@ -1,14 +1,10 @@
 package hidato;
 
-import java.util.ArrayList;
-
 public class Hidato {
 
 	private int start;
 	private int end;
 	private Cell[][] board;
-	private ArrayList<Integer> existingValues = new ArrayList<Integer>();
-	private ArrayList<Integer> nonExistingValues = new ArrayList<Integer>();
 
 	public Hidato(int start, int end, Cell[][] board) throws Exception{
 		super();
@@ -33,22 +29,6 @@ public class Hidato {
 		}
 		
 		if(foundStart == false || foundEnd == false) throw new Exception("Hidato Exception :: start or end value doesn't exist in the board.");
-	
-		//when we create the Hidato riddle, it is useful to have all its current existing values
-		for(int i=0; i<board.length; i++) {
-			for(int j=0; j<board.length;j++) {
-				Cell current = board[i][j];
-				if(current.getValue() != null) {
-					existingValues.add(current.getValue().intValue());
-				}
-			}
-		}
-
-		//also useful to know what's the values that can be filled in?
-		for(int i=start; i<= end; i++) {
-			if(!existingValues.contains(i))
-				nonExistingValues.add(i);
-		}
 	}
 
 	public int getStart() {
@@ -75,15 +55,6 @@ public class Hidato {
 		this.board = board;
 	}
 
-	public ArrayList<Integer> getExistingValues() {
-		return existingValues;
-	}
-
-	public ArrayList<Integer> getNonExistingValues() {
-		return nonExistingValues;
-	}
-
-
 	public Cell getCellByVertexIndex(int index) {
 		for(int i=0; i<board.length; i++) {
 			for(int j=0;j<board[i].length;j++) {
@@ -95,6 +66,12 @@ public class Hidato {
 		return null;
 	}
 	
+	public boolean isCellWithExistingValue(int index) {
+		Cell cell = getCellByVertexIndex(index);
+		if(cell.getValue() == null) return false;
+		else return true;
+	}
+	
 	public Cell getCellByVertexValueIfExistsOrNull(int value) {
 		for(int i=0; i<board.length; i++) {
 			for(int j=0;j<board[i].length;j++) {
@@ -104,11 +81,6 @@ public class Hidato {
 			}
 		}
 		return null;
-	}
-
-	public void addToExistingValue(int valueToTry) {
-		existingValues.add(valueToTry);	
-		nonExistingValues.remove(nonExistingValues.indexOf(valueToTry));
 	}
 
 	public void setCellWithNewValue(int index, Integer value) {
@@ -124,30 +96,7 @@ public class Hidato {
 
 	public String toString() {
 		String ans = "\n";
-		ans += "Start = " + start + ", End = "+end + "\n";
-		ans += "Existing values: {";
-
-		for(int i=0; i< existingValues.size(); i++) {
-			if(i < existingValues.size()-1) {
-				ans += ""+existingValues.get(i).intValue()+" ,";
-			} else {
-				ans += ""+existingValues.get(i).intValue();
-			}
-		}
-
-		ans += "}\n";
-		ans += "Non existing values: {";
-
-		for(int i=0; i< nonExistingValues.size(); i++) {
-			if(i < nonExistingValues.size()-1) {
-				ans += ""+nonExistingValues.get(i).intValue()+" ,";
-			} else {
-				ans += ""+nonExistingValues.get(i).intValue();
-			}
-		}
-
-		ans += "}\n\n";
-
+		ans += "Start = " + start + ", End = "+end + "\n\n";
 		for(int i=0; i<board.length; i++) {
 			for(int j=0; j<board[i].length; j++) {
 				Integer currValue = board[i][j].getValue();

@@ -10,12 +10,12 @@ public class MainAlgorithmRunner {
 	public static void solveHidatoPuzzleWithReductionToHemiltonianPathWithRestrictions() throws Exception {
 		CellGenerator cellGenerator = new CellGenerator();
 		
-		Cell[][] board = {{cellGenerator.Generate(),    cellGenerator.Generate(),     cellGenerator.Generate(),   cellGenerator.Generate(),    cellGenerator.Generate(),cellGenerator.Generate()},
-						  {cellGenerator.Generate(),      cellGenerator.Generate(),    cellGenerator.Generate(),   cellGenerator.Generate(),    cellGenerator.Generate(),cellGenerator.Generate()},
-						  {cellGenerator.Generate(),      cellGenerator.Generate(),     cellGenerator.Generate(),   cellGenerator.Generate(),    cellGenerator.Generate(),cellGenerator.Generate()},
-						  {cellGenerator.Generate(),      cellGenerator.Generate(),     cellGenerator.Generate(),   cellGenerator.Generate(),   cellGenerator.Generate(),cellGenerator.Generate()},
-						  {cellGenerator.Generate(),      cellGenerator.Generate(),     cellGenerator.Generate(),   cellGenerator.Generate(),   cellGenerator.Generate(4),cellGenerator.Generate()},
-						  {cellGenerator.Generate(),    cellGenerator.Generate(36),     cellGenerator.Generate(),   cellGenerator.Generate(),    cellGenerator.Generate(5),cellGenerator.Generate(1)}};
+		Cell[][] board = {{cellGenerator.Generate(25),     cellGenerator.Generate(),      cellGenerator.Generate(),       cellGenerator.Generate(),      cellGenerator.Generate()},
+						  {cellGenerator.Generate(8),      cellGenerator.Generate(),      cellGenerator.Generate(),      cellGenerator.Generate(),      cellGenerator.Generate()},
+						  {cellGenerator.Generate(7),      cellGenerator.Generate(3),     cellGenerator.Generate(),      cellGenerator.Generate(),       cellGenerator.Generate()},
+						  {cellGenerator.Generate(6),      cellGenerator.Generate(),     cellGenerator.Generate(),      cellGenerator.Generate(),     cellGenerator.Generate()},
+						  {cellGenerator.Generate(5),      cellGenerator.Generate(),     cellGenerator.Generate(),      cellGenerator.Generate(),     cellGenerator.Generate(1)},
+						 };
 
 		Hidato hidato = new Hidato(1,board.length*board.length,board);
 		ReductionToHamiltonianPathAlgorithm reductionToHamiltonianPath = new ReductionToHamiltonianPathAlgorithm(hidato);

@@ -1,5 +1,6 @@
 package main;
 
+import algorithms.probability;
 import hidato.Cell;
 import hidato.CellGenerator;
 import hidato.Hidato;
@@ -23,7 +24,11 @@ public class MainAlgorithmRunner {
 	}
 	
 	public static void main(String[] args) throws Exception {
-		solveHidatoPuzzleWithReductionToHemiltonianPathWithRestrictions();
+		//solveHidatoPuzzleWithReductionToHemiltonianPathWithRestrictions();
+		
+		double[] m = new double[]{0.9,0.7,0.6,0.4,0.2,0.1,0.015,0.01};
+	    new probability(7,m, 10000);
+		
 	}
 
 }

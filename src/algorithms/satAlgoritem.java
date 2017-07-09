@@ -1,12 +1,6 @@
 package algorithms;
 
-import java.io.Console;
 import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Random;
-
-
 
 import CNF.CNF;
 import CNF.Clause;
@@ -18,7 +12,7 @@ public class satAlgoritem {
 	   public ArrayList<Literal> myLiteral;
        public CNF CNFclause;
        public int size;
-       
+       	
 	   public  satAlgoritem(int[][] graph,int size,int [] value)
 	   {
 		   myLiteral=new ArrayList<Literal>();
@@ -146,54 +140,3 @@ public class satAlgoritem {
 
 
 
-
-
-
-
-
-
-
-/*
-List<Integer> grayCodeNumers = createGrayCode(a.myLiteral.size()/2);
-System.out.print("a");
-for(int i=0; i < grayCodeNumers.size(); i++) {
-	int number = grayCodeNumers.get(i);
-	int binary[] = new int[a.myLiteral.size()/2];
-	int index = 0;
-	while(number > 0){
-		binary[index++] = number%2;
-		number = number/2;
-	}
-	int curr = 0;
-	for(int k = binary.length-1;k >= 0;k--){
-		if(binary[k] == 1) {
-			a.myLiteral.get(curr).setAssigning(true);
-			a.myLiteral.get(curr+1).setAssigning(true);
-		} else { 
-			
-			a.myLiteral.get(curr).setAssigning(false);
-			a.myLiteral.get(curr+1).setAssigning(false);
-		}
-		curr = curr + 2;
-	}
-    if(a.CNFclause.isSatisfied())
-    	System.out.print(binary.toString());
-	
-}
-
-
-}    	   
-
-public static List<Integer> createGrayCode(int n) {
-List<Integer> ret = new LinkedList<>();
-ret.add(0);
-for (int i = 0; i < n; i++) {
-	int size = ret.size();
-	for (int j = size - 1; j >= 0; j--) {
-		Integer n1 = (Integer)ret.get(j) + size;
-		ret.add(n1);
-	}
-}
-return ret;
-} 
-*/
